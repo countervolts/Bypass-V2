@@ -1,2 +1,2 @@
 # what is this
-complete rewrite and to be inproved bypasser from my first version
+complete rewrite and to be improved bypasser from my first version
