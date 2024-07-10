@@ -8,6 +8,9 @@ import threading
 import os
 import winreg
 
+from network.net import *
+from utils.utils import *
+
 colorama.init()
 
 class ArpSpoofer:
@@ -71,9 +74,6 @@ class ArpSpoofer:
         input("\nBypass running. Press enter to stop the bypass.")
 
 if __name__ == "__main__":
-    from utils.utils import title, has_perms, permission_giver, clear_console
-    from network.net import transport_names, neftcfg_search, search, init_bypass, mac_saver
-
     title()
 
     if not has_perms():
