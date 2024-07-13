@@ -1,0 +1,4 @@
+winreg
+scrapy
+netiface
+colorama
