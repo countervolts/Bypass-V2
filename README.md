@@ -19,6 +19,7 @@ removed the following
 - checking if bypass has been ran already
 - removed all beta features entirely (except for FauxDisconnect)
 - removed user debugging
+- auto updater
 
 as well improved bypassing feature which doesnt require the user to restart their computer
 # how to run
