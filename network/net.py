@@ -3,7 +3,6 @@ import re
 import winreg
 import random
 import os
-from datetime import datetime
 
 def transport_names():
     try:
@@ -24,7 +23,7 @@ def transport_names():
         return transport_names, mp_transport
 
     except subprocess.CalledProcessError as e:
-        print(f"Error: {e}")
+        input(f"Error: {e}")
         return [], None
 
 def neftcfg_search(transport_name):
@@ -80,6 +79,10 @@ def get_selected_transport():
 def trans_dir(sub_name):
     return "SYSTEM\\ControlSet001\\Control\\Class\\{4d36e972-e325-11ce-bfc1-08002be10318}\\" + sub_name
 
+import os
+import winreg
+from datetime import datetime
+
 def mac_saver():
     _, mp_transport = transport_names()
     instances = neftcfg_search(mp_transport)
@@ -90,11 +93,12 @@ def mac_saver():
         old_mac = winreg.QueryValueEx(key, 'NetworkAddress')[0]
         winreg.CloseKey(key)
 
-        appdata_path = os.getenv('APPDATA')
-        bypasser_file_path = os.path.join(appdata_path, 'bypasser.txt')
-        current_date = datetime.now().strftime("%M/%D/%Y")
-        with open(bypasser_file_path, 'w') as file:
-            file.write(f"{old_mac} - {current_date}")
+        desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        file_path = os.path.join(desktop_path, 'howtochange.txt')
+        with open(file_path, 'w') as file:
+            file.write(f"{old_mac}\n")
+            file.write("to change it back use this command in cmd:\n")
+            file.write(f"reg add \"HKEY_LOCAL_MACHINE\\{trans_dir(sub_name)}\" /v NetworkAddress /d {old_mac} /f\n")
 
         return old_mac
     return None
@@ -112,7 +116,7 @@ def init_bypass(sub_name):
             winreg.CloseKey(key)
             return value_data
         except Exception as e:
-            print(f"uh oh: {e}")
+            input(f"uh oh: {e}")
             attempts -= 1
 
     print("failed after multiple attempts")
