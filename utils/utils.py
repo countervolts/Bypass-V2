@@ -1,12 +1,9 @@
-import random
-import string
 import ctypes
 import os
 import sys
-import requests
 
 def title():
-    ctypes.windll.kernel32.SetConsoleTitleW("Bypasser Version 2 (BETA VERSION)")
+    ctypes.windll.kernel32.SetConsoleTitleW("pbb v1")
 
 def has_perms():
     try:
