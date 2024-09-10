@@ -1,4 +1,1 @@
-winreg
-scrapy
-netiface
 colorama
