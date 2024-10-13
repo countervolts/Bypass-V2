@@ -1,9 +1,8 @@
 import colorama
-from colorama import Fore, Style
 import winreg
 
-from network.net import *
-from utils.utils import *
+from network.net import transport_names, neftcfg_search, search, init_bypass, mac_saver
+from utils.utils import title, has_perms, permission_giver, clear_console
 
 colorama.init()
 

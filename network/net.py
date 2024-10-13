@@ -3,6 +3,7 @@ import re
 import winreg
 import random
 import os
+from getmac import get_mac_address
 
 def transport_names():
     try:
@@ -79,20 +80,25 @@ def get_selected_transport():
 def trans_dir(sub_name):
     return "SYSTEM\\ControlSet001\\Control\\Class\\{4d36e972-e325-11ce-bfc1-08002be10318}\\" + sub_name
 
-import os
-import winreg
-from datetime import datetime
-
 def mac_saver():
     _, mp_transport = transport_names()
     instances = neftcfg_search(mp_transport)
 
+    old_mac = None
+
     if instances:
         _, sub_name = instances[0]
-        key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, trans_dir(sub_name), 0, winreg.KEY_READ)
-        old_mac = winreg.QueryValueEx(key, 'NetworkAddress')[0]
-        winreg.CloseKey(key)
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, trans_dir(sub_name), 0, winreg.KEY_READ)
+            old_mac = winreg.QueryValueEx(key, 'NetworkAddress')[0]
+            winreg.CloseKey(key)
+        except FileNotFoundError:
+            pass
 
+    if not old_mac:
+        old_mac = get_mac_address()
+
+    if old_mac:
         desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
         file_path = os.path.join(desktop_path, 'howtochange.txt')
         with open(file_path, 'w') as file:
