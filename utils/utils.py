@@ -3,7 +3,7 @@ import os
 import sys
 
 def title():
-    ctypes.windll.kernel32.SetConsoleTitleW("pbb v1")
+    ctypes.windll.kernel32.SetConsoleTitleW("pbb v1.2")
 
 def has_perms():
     try:
@@ -15,6 +15,7 @@ def permission_giver():
     try:
         script_path = os.path.abspath(sys.argv[0])
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, f'"{script_path}"', None, 1)
+        sys.exit(0)
     except Exception as e:
         input(f"problem with giving permissions: {e}")
 

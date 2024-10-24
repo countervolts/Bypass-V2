@@ -11,6 +11,7 @@ def transport_names():
         lines = output.splitlines()
 
         transport_names = []
+        driver_descriptions = []
         mp_transport = None
 
         for line in lines:
@@ -21,11 +22,41 @@ def transport_names():
                 if mp_transport is None and transport_name != '':
                     mp_transport = transport_name
 
-        return transport_names, mp_transport
+        key_path = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}"
+        try:
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path, 0, winreg.KEY_READ)
+            subkey_index = 0
 
+            while True:
+                try:
+                    sub_name = winreg.EnumKey(key, subkey_index)
+                    subkey = winreg.OpenKey(key, sub_name)
+                    try:
+                        net_cfg_instance_id, _ = winreg.QueryValueEx(subkey, 'NetCfgInstanceId')
+                        if net_cfg_instance_id in transport_names:
+                            try:
+                                driver_desc, _ = winreg.QueryValueEx(subkey, "DriverDesc")
+                                driver_descriptions.append(f"{driver_desc}")
+                            except FileNotFoundError:
+                                driver_descriptions.append(f"Unknown")
+                        else:
+                            pass                            
+                    except FileNotFoundError:
+                        pass
+                    finally:
+                        winreg.CloseKey(subkey)
+                    subkey_index += 1
+                except OSError:
+                    break
+            winreg.CloseKey(key)
+        except Exception as e:
+            print(f"Error accessing registry: {e}")
+            return [], [], None
+        return transport_names, driver_descriptions, mp_transport
     except subprocess.CalledProcessError as e:
-        input(f"Error: {e}")
-        return [], None
+        print(f"Error: {e}")
+        return [], [], None
+
 
 def neftcfg_search(transport_name):
     key_path = r"SYSTEM\ControlSet001\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}"
@@ -74,14 +105,14 @@ def rand0m_hex():
     return 'DE' + random_hex
 
 def get_selected_transport():
-    _, mp_transport = transport_names()
+    _, _, mp_transport = transport_names()
     return mp_transport
 
 def trans_dir(sub_name):
     return "SYSTEM\\ControlSet001\\Control\\Class\\{4d36e972-e325-11ce-bfc1-08002be10318}\\" + sub_name
 
 def mac_saver():
-    _, mp_transport = transport_names()
+    _, _, mp_transport = transport_names()
     instances = neftcfg_search(mp_transport)
 
     old_mac = None
@@ -96,7 +127,9 @@ def mac_saver():
             pass
 
     if not old_mac:
-        old_mac = get_mac_address()
+        old_mac = get_mac_address(interface="Ethernet")
+        if not old_mac:
+            old_mac = get_mac_address(interface="Wi-Fi")
 
     if old_mac:
         desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -126,4 +159,4 @@ def init_bypass(sub_name):
             attempts -= 1
 
     print("failed after multiple attempts")
-    return None 
+    return None

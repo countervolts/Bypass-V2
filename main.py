@@ -1,10 +1,7 @@
-import colorama
 import winreg
 
 from network.net import transport_names, neftcfg_search, search, init_bypass, mac_saver
 from utils.utils import title, has_perms, permission_giver, clear_console
-
-colorama.init()
 
 if __name__ == "__main__":
     title()
@@ -16,17 +13,18 @@ if __name__ == "__main__":
     if user_input == 'y':
         mac_saver()
         input("it has been saved to your desktop named 'howtochange.txt'\nthis also tells you how to change it back using cmd\npress enter to continue")
-    transport_names, mp_transport = transport_names()
-    if transport_names:
-        print("\nAvailable transport names (the first one is usually the correct one):")
-        for idx, name in enumerate(transport_names[:5]):
+    transport_names_list, driver_desc_list, mp_transport = transport_names()
+    if transport_names_list:
+        print("\nAvailable transport names with descriptions:")
+        for idx, name in enumerate(transport_names_list[:5]):
+            driver_desc = driver_desc_list[idx] if idx < len(driver_desc_list) else "Unknown"
             if name == mp_transport:
-                print(f"{idx + 1}. {name} (default)")
+                print(f"{idx + 1}. {name} ({driver_desc})")
             else:
-                print(f"{idx + 1}. {name}")
+                print(f"{idx + 1}. {name} ({driver_desc})")
         selected_index = int(input("enter the number: ")) - 1
-        if 0 <= selected_index < len(transport_names):
-            selected_transport_name = transport_names[selected_index]
+        if 0 <= selected_index < len(transport_names_list):
+            selected_transport_name = transport_names_list[selected_index]
             print(f"\nSelected transport name: {selected_transport_name}\n")
             instances = neftcfg_search(selected_transport_name)
             if instances:
