@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 getmac
+=======
+getmac
+>>>>>>> fcd0c80eab3a031970faa05812cb4cc5da0ddcef
