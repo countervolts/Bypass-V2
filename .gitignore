@@ -2,3 +2,6 @@
 /dist/*
 /build/*
 *.pyc
+
+# getting sha, md5, crc32 and timestamp
+info.py

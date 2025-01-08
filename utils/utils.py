@@ -3,7 +3,7 @@ import os
 import sys
 
 def title():
-    ctypes.windll.kernel32.SetConsoleTitleW("pbb v1.2")
+    ctypes.windll.kernel32.SetConsoleTitleW("pbb v1.3")
 
 def has_perms():
     try:
