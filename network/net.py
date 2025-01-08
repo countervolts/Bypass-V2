@@ -3,7 +3,20 @@ import re
 import winreg
 import random
 import os
-from getmac import get_mac_address
+
+def get_mac_address():
+    try:
+        output = subprocess.check_output(
+            'getmac /v /fo list | findstr "Physical Address" | find /v "" /n | find "[1]"',
+            shell=True,
+            universal_newlines=True
+        )
+        match = re.search(r'Physical Address:\s+([A-F0-9-]+)', output)
+        if match:
+            return match.group(1)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: {e}")
+    return None
 
 def transport_names():
     try:
@@ -112,24 +125,43 @@ def trans_dir(sub_name):
     return "SYSTEM\\ControlSet001\\Control\\Class\\{4d36e972-e325-11ce-bfc1-08002be10318}\\" + sub_name
 
 def mac_saver():
-    _, _, mp_transport = transport_names()
+    virtual_adapters_to_ignore = [
+        "Hyper-V Virtual Ethernet Adapter",
+        "VirtualBox Host-Only Ethernet Adapter",
+        "VMware Virtual Ethernet Adapter",
+        "Microsoft Wi-Fi Direct Virtual Adapter",
+        "Microsoft Hosted Network Virtual Adapter"
+    ]
+
+    transport_names_list, driver_desc_list, mp_transport = transport_names()
     instances = neftcfg_search(mp_transport)
 
     old_mac = None
+    selected_sub_name = None
 
     if instances:
-        _, sub_name = instances[0]
+        for instance in instances:
+            _, sub_name = instance
+            try:
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, trans_dir(sub_name), 0, winreg.KEY_READ)
+                driver_desc, _ = winreg.QueryValueEx(key, 'DriverDesc')
+                if driver_desc not in virtual_adapters_to_ignore:
+                    selected_sub_name = sub_name
+                    break
+                winreg.CloseKey(key)
+            except FileNotFoundError:
+                pass
+
+    if selected_sub_name:
         try:
-            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, trans_dir(sub_name), 0, winreg.KEY_READ)
+            key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, trans_dir(selected_sub_name), 0, winreg.KEY_READ)
             old_mac = winreg.QueryValueEx(key, 'NetworkAddress')[0]
             winreg.CloseKey(key)
         except FileNotFoundError:
             pass
 
     if not old_mac:
-        old_mac = get_mac_address(interface="Ethernet")
-        if not old_mac:
-            old_mac = get_mac_address(interface="Wi-Fi")
+        old_mac = get_mac_address()
 
     if old_mac:
         desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
@@ -137,7 +169,7 @@ def mac_saver():
         with open(file_path, 'w') as file:
             file.write(f"{old_mac}\n")
             file.write("to change it back use this command in cmd:\n")
-            file.write(f"reg add \"HKEY_LOCAL_MACHINE\\{trans_dir(sub_name)}\" /v NetworkAddress /d {old_mac} /f\n")
+            file.write(f"reg add \"HKEY_LOCAL_MACHINE\\{trans_dir(selected_sub_name)}\" /v NetworkAddress /d {old_mac} /f\n")
 
         return old_mac
     return None

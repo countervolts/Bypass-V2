@@ -4,7 +4,7 @@ fixed version with just what is needed to run the bypass
 # fixed/improved things
 - improved mac address saver to now tell the user how to change it back
 - improved general code running 
-
+- now ignores virtual adapters
 
 # changed things
 removed everything except for the main bypass code
