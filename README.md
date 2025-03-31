@@ -1,8 +1,12 @@
 ## new version
-get it [here](https://github.com/countervolts/network-related-thing)
+GET IT HERE --->> [Bypass-v3](https://github.com/countervolts/network-related-thing) <<---
 
-# what is this
-fixed version with just what is needed to run the bypass
+it includes the following
+- a network scanner to see online and active devices on your network
+- a one-click bypass, removing the need for user input, and removing the need to restart your computer
+- a new in house way to turn other devices internet off from your own
+- a way to revert your mac address
+- a new web-based interface
 
 # fixed/improved things
 - improved mac address saver to now tell the user how to change it back
