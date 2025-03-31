@@ -1,3 +1,6 @@
+## new version
+get it [here](https://github.com/countervolts/network-related-thing)
+
 # what is this
 fixed version with just what is needed to run the bypass
 
